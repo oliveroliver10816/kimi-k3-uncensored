@@ -50,14 +50,45 @@ Dropping 64 more experts to buy 0.3 bits/weight nearly 4×'d the result. ⚠ **n
 weight publisher, no independent replication** — direction sound, magnitude is marketing.
 ⇒ REAP (expert pruning) is where the community went instead of deeper quantisation.
 
-## ⚠ The Beast does not fit it — and the gap cannot be quantised away
-96 GB (RTX PRO 6000) + 32 GB (5090) = 128 GB VRAM + 61.6 GB RAM = **189.6 GB addressable** (specs measured
-2026-08-04, `minimax-h3/CLAUDE.md`). D: 5.3 TB free — storage was never the constraint.
-- newest uncensored 579.5 GB = **3.1× over** · best REAP 478.5 GB = 2.5× over
-- **smallest K3 quant that exists at all (UD-Q1_0) 466 GB = 2.5× over** — and that rung IS the gibberish zone
-- full abliterated safetensors 1,561 GB = 8.2× over
-⚠ Second wall: hellohazime measures **~3.0 tok/s decode** for a 478 GB build *fully resident* in 512 GB
-unified memory (Mac Studio M3 Ultra). Streaming off NVMe is far worse.
+## ⚠⚠ RIG SPECS CORRECTED 2026-08-14 by live probe — the old numbers were wrong
+Probed the box directly (jobs 1991/1992). **Two corrections, both material:**
+1. **ONE GPU, not two.** `nvidia-smi` = index 0 only, **RTX PRO 6000 Blackwell 97,887 MiB (95.6 GB)**,
+   driver 582.08. **No RTX 5090 installed.** The root map + `minimax-h3/CLAUDE.md` both say
+   "5090 32GB + RTX 6000 Pro 96GB" — that is the *plan* from [[workstation-build]], not the machine.
+   ⇒ **VRAM 95.6 GB, not 128 GB.** Total addressable = 95.6 + 61.6 = **157.2 GB**.
+2. **The RAM upgrade path is closed.** Board = **MSI MPG X870E CARBON WIFI (MS-7E49)**, AM5,
+   **Ryzen 9 9950X3D**, 4 slots, **SMBIOS array max 128 GB**; fitted 2×32 GB Kingston KF560C36-32 @
+   4800 MT/s, 2 slots free. 512 GB is **unreachable on this platform** — needs Threadripper PRO /
+   Xeon W / EPYC / Mac Studio Ultra. Also ⚠ 4 DIMMs on AM5 clocks down hard.
+
+Disks: C: 990 PRO 2TB (1,112 GB free) · **D: WD_BLACK SN850X 8TB, 5,213 GB free** · E: 990 PRO 2TB.
+**D: winsat unbuffered: sequential read 6,726 MB/s · random 16K read 428 MB/s.**
+**HuggingFace download 22.7 MB/s** (300 MB ranged GET on the real shard) ⇒ 579.5 GB = **7.1 h**.
+⚠ `speed.cloudflare.com/__down` **403s from the rig** — measure with a real file.
+
+Nothing uncensored is memory-resident: 579.5 GB = **3.7× over** · REAP576 478.5 GB = 3.0× ·
+smallest K3 quant in existence (UD-Q1_0) 466 GB = 3.0× · full safetensors 1,561 GB = 9.9×.
+
+## ⭐ BUT "doesn't fit" ≠ "can't run" — the §08 answer Bob asked for
+llama.cpp mmaps the GGUF; only the **104B active params of 2.8T** are touched per token. At this build's
+1.66 bits/param that is **~21.6 GB read per token**. VRAM 95.6 + ~50 GB page cache ≈ 145 GB = 25% of the
+model resident; skewed routing puts the real hit rate ~35–45% ⇒ **~13 GB off D: per token**.
+| scenario | D: rate | result |
+|---|---|---|
+| ceiling, pure sequential | 6,726 MB/s | 0.52 tok/s |
+| realistic, ~6 MB expert tensors scattered | ~2,000 MB/s | **~0.15 tok/s** |
+| floor, random 16K | 428 MB/s | 0.03 tok/s |
+⇒ 500-token answer ≈ **55 min**; overnight 8 h ≈ **4,300 tokens** (8–9 answers). A model that FITS 95.6 GB
+at 4-bit runs 20–40 tok/s = **150–250× faster**.
+🛑 **All tok/s figures are MODELLED** from measured disk rates + hellohazime's resident anchor — not observed.
+**Run flags that matter:** `--no-warmup` (else it reads all 579.5 GB at load), leave **mmap ON** (never
+`--no-mmap`), `-ngl 99 --n-cpu-moe N` tuned so VRAM sits ~90/95.6 GB (each layer's expert set ≈ 5.6 GB,
+so ~15 layers fit on the card), `-c 8192` (never the 1M context — KV steals the expert cache).
+⚠ **Windows is the wrong OS for a 579.5 GB mmap** (standby-list handling; we already hit "Windows silently
+spills VRAM with zero errors" on this box). ⚠ Installing the 5090 → 127.6 GB VRAM ≈ 31% resident ≈
+0.19 tok/s — real but not category-changing.
+⚠ It is still the **IQ1_S expert class** = the arm that lost the §04 A/B 5/8 vs 7/8. Best-engineered shot
+(F32 router + IQ4_XS attn + imatrix target exactly that failure), but a shot.
 
 ## ⚠ TRAP — `ubicloud/Kimi-K3-Pruned-65B` (41.9 GB) is NOT a small K3
 Its card: *"retains the first 3 layer(s) of the original 93 layer(s) … intended for pipeline testing rather
