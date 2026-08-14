@@ -125,7 +125,7 @@ footer .fl{font:600 11px/1 var(--mono);letter-spacing:.16em;text-transform:upper
 
 <header class="top">
   <div class="wrap">
-    <div class="kicker">Research · 14 August 2026 · nothing downloaded, nothing installed</div>
+    <div class="kicker">Research · 14 August 2026 · updated with live rig measurements · nothing downloaded, nothing installed</div>
     <h1>Kimi K3 uncensored: there is no newer model — <em>and that is why yours babbled</em></h1>
     <p class="sub">You asked what the latest K3 uncensored version is. The honest answer has two halves: the base model has not moved since 27 July, and the reason every build you tried collapsed into gibberish is a single number that nobody puts on the model card.</p>
     <div class="meta">
@@ -134,7 +134,7 @@ footer .fl{font:600 11px/1 var(--mono);letter-spacing:.16em;text-transform:upper
       <span>896 experts · <b>top-16</b></span>
       <span>93 layers · <b>1M ctx</b></span>
       <span>all sizes from the <b>HF API</b>, not model cards</span>
-      <span>rig <b>untouched</b></span>
+      <span>rig <b>probed live</b></span>
     </div>
   </div>
 </header>
@@ -157,8 +157,8 @@ footer .fl{font:600 11px/1 var(--mono);letter-spacing:.16em;text-transform:upper
   </div>
   <div class="vcell">
     <div class="lab">Fits the Beast?</div>
-    <div class="big c-hot">2.5× short</div>
-    <p>189.6 GB addressable vs a 466 GB floor. Nothing uncensored fits, at any quantisation that still speaks.</p>
+    <div class="big c-hot">3.7× short</div>
+    <p>157.2 GB addressable vs 579.5 GB. It <em>can</em> still be run — streamed off D: — at roughly <strong>0.2 tok/s</strong>. See §08.</p>
   </div>
 </div>
 
@@ -302,19 +302,33 @@ footer .fl{font:600 11px/1 var(--mono);letter-spacing:.16em;text-transform:upper
 
 <section>
   <div class="snum">05 — the rig</div>
-  <h2>The Beast is 2.5× short, and the gap cannot be quantised away</h2>
-  <p class="lede">Specs as measured on the workstation on 4 Aug: RTX PRO 6000 96 GB + RTX 5090 32 GB = 128 GB VRAM, plus 61.6 GB system RAM. D: has 5.3 TB free, so storage was never the problem — <strong>memory is</strong>.</p>
+  <h2>The Beast, measured properly — and two corrections</h2>
+  <p class="lede">I probed the workstation directly rather than reusing the old figures, and two things came back different from what our notes said.</p>
 
-  <div class="maths">
-    <div class="mrow head"><div>Candidate</div><div class="r">Needs</div><div class="r">vs 189.6 GB</div><div>&nbsp;</div></div>
-    <div class="mrow"><div>Newest uncensored — Ryanchen911 IQ1_S-XS</div><div class="r">579.5 GB</div><div class="r c-hot">3.1× over</div><div><div class="bar"><i style="width:100%;background:linear-gradient(90deg,#ff5f45,#c14330)"></i></div></div></div>
-    <div class="mrow"><div>Best-measured REAP576-IQ2_XXS</div><div class="r">478.5 GB</div><div class="r c-hot">2.5× over</div><div><div class="bar"><i style="width:83%;background:linear-gradient(90deg,#ff5f45,#c14330)"></i></div></div></div>
-    <div class="mrow"><div>Smallest K3 quant that exists at all — UD-Q1_0</div><div class="r">466.0 GB</div><div class="r c-hot">2.5× over</div><div><div class="bar"><i style="width:80%;background:linear-gradient(90deg,#ff5f45,#c14330)"></i></div></div></div>
-    <div class="mrow"><div>Full abliterated safetensors</div><div class="r">1,561.0 GB</div><div class="r c-hot">8.2× over</div><div><div class="bar"><i style="width:100%;background:linear-gradient(90deg,#8e2b1e,#5c1d15)"></i></div></div></div>
-    <div class="mrow"><div><strong>The Beast — 128 GB VRAM + 61.6 GB RAM</strong></div><div class="r c-good">189.6 GB</div><div class="r c-good">ceiling</div><div><div class="bar"><i style="width:33%;background:linear-gradient(90deg,#3ddc97,#2fa876)"></i></div></div></div>
+  <div class="note stop">
+    <span class="nl">Correction 1 — there is one GPU in that machine, not two</span>
+    <p><span class="mono">nvidia-smi</span> returns a single device: <strong>RTX PRO 6000 Blackwell Workstation, 97,887 MiB (95.6 GB), driver 582.08</strong>. No RTX 5090 is present. Our project notes have been carrying "5090 32 GB + RTX PRO 6000" — that is wrong for this box. <strong>VRAM is 95.6 GB, not 128 GB.</strong> If the 5090 exists and is simply not installed, say so and it changes the cache maths below (not the verdict).</p>
   </div>
 
-  <p>Note where the two walls sit. Even the <strong>smallest quantisation that has ever been made of this model</strong> is 2.5× more memory than the Beast has — and that rung is precisely the 1-bit class that produced your gibberish. There is no setting where the model both fits and speaks.</p>
+  <div class="note stop">
+    <span class="nl">Correction 2 — the RAM upgrade path is closed on this platform</span>
+    <p>Board is an <strong>MSI MPG X870E CARBON WIFI (MS-7E49)</strong> with a <strong>Ryzen 9 9950X3D</strong> — consumer AM5, <strong>4 DIMM slots, SMBIOS-reported maximum 128 GB</strong>. Fitted today: 2 × 32 GB Kingston at 4800 MT/s = 61.6 GB visible, 2 slots free.</p>
+    <p>So the ceiling here is 128 GB of RAM (optimistically 192 GB if the BIOS takes 48 GB DIMMs). <strong>You cannot reach the 512 GB that makes this model resident.</strong> That is a platform limit, not a budget one — 512 GB needs Threadripper PRO / Xeon W / EPYC / Mac Studio Ultra.</p>
+  </div>
+
+  <h3>Storage is the one thing that's plentiful</h3>
+  <p>D: is a <strong>WD_BLACK SN850X 8 TB</strong> with <strong>5,213 GB free</strong> — the 579.5 GB download is a non-issue. Measured unbuffered with winsat: <span class="hl">sequential read 6,726 MB/s</span>, <span class="hl">random 16 K read 428 MB/s</span>. Hold on to that second number; it is what decides everything in §08.</p>
+
+  <div class="maths">
+    <div class="mrow head"><div>Candidate</div><div class="r">Needs</div><div class="r">vs 157.2 GB</div><div>&nbsp;</div></div>
+    <div class="mrow"><div>Newest uncensored — Ryanchen911 IQ1_S-XS</div><div class="r">579.5 GB</div><div class="r c-hot">3.7× over</div><div><div class="bar"><i style="width:100%;background:linear-gradient(90deg,#ff5f45,#c14330)"></i></div></div></div>
+    <div class="mrow"><div>Best-measured REAP576-IQ2_XXS</div><div class="r">478.5 GB</div><div class="r c-hot">3.0× over</div><div><div class="bar"><i style="width:83%;background:linear-gradient(90deg,#ff5f45,#c14330)"></i></div></div></div>
+    <div class="mrow"><div>Smallest K3 quant that exists at all — UD-Q1_0</div><div class="r">466.0 GB</div><div class="r c-hot">3.0× over</div><div><div class="bar"><i style="width:80%;background:linear-gradient(90deg,#ff5f45,#c14330)"></i></div></div></div>
+    <div class="mrow"><div>Full abliterated safetensors</div><div class="r">1,561.0 GB</div><div class="r c-hot">9.9× over</div><div><div class="bar"><i style="width:100%;background:linear-gradient(90deg,#8e2b1e,#5c1d15)"></i></div></div></div>
+    <div class="mrow"><div><strong>The Beast — 95.6 GB VRAM + 61.6 GB RAM</strong></div><div class="r c-good">157.2 GB</div><div class="r c-good">ceiling</div><div><div class="bar"><i style="width:27%;background:linear-gradient(90deg,#3ddc97,#2fa876)"></i></div></div></div>
+  </div>
+
+  <p>Nothing uncensored fits in memory. But "doesn't fit" is not the same as "can't run" — §08 is how you'd run it anyway, and what that actually costs you.</p>
 
   <div class="note warn">
     <span class="nl">The second wall, if you were thinking of streaming it off D:</span>
@@ -386,7 +400,64 @@ footer .fl{font:600 11px/1 var(--mono);letter-spacing:.16em;text-transform:upper
 </section>
 
 <section>
-  <div class="snum">08 — provenance</div>
+  <div class="snum">08 — the answer</div>
+  <h2>How you would actually run Ryanchen911's build on the Beast</h2>
+  <p class="lede">"Doesn't fit in memory" does not mean "won't run". llama.cpp memory-maps the GGUF and pulls pages off disk on demand, so the file can be far larger than RAM. What you buy with that is speed, and here is exactly what it costs.</p>
+
+  <h3>Why it can run at all: only 104B of the 2.8T parameters are touched per token</h3>
+  <p>That is the whole reason this is even a conversation. At this build's average of <strong>1.66 bits per parameter</strong>, one token needs roughly <span class="hl">21.6 GB of weights read</span> — not 579.5 GB. Your 95.6 GB of VRAM plus about 50 GB of usable page cache holds ~145 GB, which is <strong>25% of the model</strong>; because expert routing is skewed rather than uniform, the real hit rate lands nearer 35–45%. So each token drags roughly <strong>13 GB off D:</strong>.</p>
+
+  <div class="maths">
+    <div class="mrow head"><div>Scenario — 13 GB of disk reads per token</div><div class="r">D: rate</div><div class="r">Result</div><div>&nbsp;</div></div>
+    <div class="mrow"><div>Absolute ceiling — every read as fast as pure sequential</div><div class="r">6,726 MB/s</div><div class="r c-warm">0.52 tok/s</div><div><div class="bar"><i style="width:100%;background:linear-gradient(90deg,#ffb03a,#c9852a)"></i></div></div></div>
+    <div class="mrow"><div>Realistic — multi-MB expert tensors, scattered</div><div class="r">~2,000 MB/s</div><div class="r c-hot">~0.15 tok/s</div><div><div class="bar"><i style="width:29%;background:linear-gradient(90deg,#ff5f45,#c14330)"></i></div></div></div>
+    <div class="mrow"><div>Floor — if reads degenerate to random 16 K</div><div class="r">428 MB/s</div><div class="r c-hot">0.03 tok/s</div><div><div class="bar"><i style="width:6%;background:linear-gradient(90deg,#8e2b1e,#5c1d15)"></i></div></div></div>
+  </div>
+
+  <p>Both disk figures are measured on your drive with winsat, unbuffered. An expert tensor at this quant is roughly 6 MB contiguous, so reads land between the two — call it <strong>0.1–0.2 tokens/sec in practice, 0.5 as a hard ceiling</strong>.</p>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>What you'd be doing</th><th class="num">At ~0.15 tok/s</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>A short reply (200 tokens)</td><td class="num">~22 minutes</td><td>Unusable interactively</td></tr>
+      <tr><td>A full answer (500 tokens)</td><td class="num">~55 minutes</td><td>Unusable interactively</td></tr>
+      <tr><td>One overnight run (8 hours)</td><td class="num">~4,300 tokens</td><td class="hl2">Workable as a batch oracle — 8 or 9 solid answers</td></tr>
+      <tr><td>Same card, a model that <em>fits</em> 95.6 GB at 4-bit</td><td class="num">20–40 tok/s</td><td><strong>150–250× faster</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>The download is the easy part</h3>
+  <p>Measured on your rig just now, pulling directly from the actual repo file: <strong>22.7 MB/s from HuggingFace</strong> (300 MB in 13.2 s). So 579.5 GB is a <span class="hl">7-hour overnight download</span>, onto a drive with 5,213 GB free. That part is genuinely trivial. <em>(Cloudflare's speed-test endpoint 403s the rig, so this is the HuggingFace number, which is the one that matters anyway.)</em></p>
+
+  <h3>The run configuration that makes it as fast as it can be</h3>
+  <p>Three flags do almost all the work here, and getting them wrong is the difference between 0.15 tok/s and not finishing at all:</p>
+  <ul style="max-width:100ch;color:var(--ink2)">
+    <li style="margin:10px 0"><strong><span class="mono">--no-warmup</span></strong> — without it llama.cpp touches every tensor at load, i.e. reads all 579.5 GB before answering anything. That alone is 24 minutes at best and hours at worst.</li>
+    <li style="margin:10px 0"><strong>mmap left ON</strong> (the default) — never pass <span class="mono">--no-mmap</span>, which would try to read the whole file into 61.6 GB of RAM and die.</li>
+    <li style="margin:10px 0"><strong><span class="mono">-ngl 99</span> plus <span class="mono">--n-cpu-moe N</span></strong> — this is the real knob. It keeps attention, the F32 router and the shared experts on the GPU while pushing routed experts to mmap. Tune <span class="mono">N</span> downward until VRAM sits around 90 of 95.6 GB, so every gigabyte of the card you aren't using for attention is working as an expert cache. Each layer's full expert set is roughly 5.6 GB, so you can hold about 15 layers' worth on the card.</li>
+    <li style="margin:10px 0"><strong><span class="mono">-c 8192</span></strong> — the model advertises 1M context; do not ask for it. KV cache is memory you are taking away from the expert cache, and the expert cache is what sets your speed.</li>
+  </ul>
+
+  <div class="note warn">
+    <span class="nl">Two risks specific to your box</span>
+    <p><strong>Windows is the wrong OS for this.</strong> A 579.5 GB mmap across 34 shards leans entirely on the page-cache manager, and Windows handles that standby list poorly under pressure — our own H3 work already hit "Windows silently spills VRAM with zero errors" on this same machine. Linux manages a mapping this size considerably better. That is a real variable, not a detail.</p>
+    <p><strong>It is still the IQ1_S expert class.</strong> Ryanchen911 keeps the router at F32 and attention at IQ4_XS and ships an imatrix — those target precisely the failure you hit — but the <em>experts</em> are still ~1.6 bits, which is the exact arm that lost the A/B in §04 by 5/8 to 7/8. This is the best-engineered shot at it, but it is a shot.</p>
+  </div>
+
+  <h3>And if you install the 5090</h3>
+  <p>Adding it takes VRAM from 95.6 to 127.6 GB, so the cache goes from ~25% to ~31% of the model. That is worth maybe 20–30% more throughput — roughly 0.15 → 0.19 tok/s. Real, but it does not change the category the thing sits in.</p>
+
+  <div class="note win">
+    <span class="nl">So, concretely</span>
+    <p><strong>Yes, you can run it — as an overnight batch oracle, not as a chat model.</strong> Cost is one 7-hour download and a day of setup, $0 in money. You queue questions, it answers 8 or 9 of them by morning, exactly like the render pipeline already works. If what you want is something to <em>talk</em> to, this is the wrong 580 GB and the right move is a model sized for the card.</p>
+    <p>Nothing is downloading. Say go and I'll start the pull and build the llama.cpp side.</p>
+  </div>
+</section>
+
+<section>
+  <div class="snum">09 — provenance</div>
   <h2>What I did, and what I did not</h2>
   <p class="lede">Every size on this page is summed from the Hugging Face blob API (<span class="mono">?blobs=true</span>), not read off a README, because the README numbers and the actual bytes disagree on several of these repos.</p>
   <div class="split">
@@ -398,15 +469,18 @@ footer .fl{font:600 11px/1 var(--mono);letter-spacing:.16em;text-transform:upper
         <li>Byte totals for all 12 repos named on this page.</li>
         <li>Model cards read as raw markdown for the ubicloud, hellohazime and Ryanchen911 claims.</li>
         <li>arXiv 2406.11717 title confirmed against arxiv.org.</li>
+        <li><strong>The rig itself, probed live</strong> — board, CPU, DIMM slots and array maximum, GPU inventory, all three NVMe drives, and unbuffered winsat read rates on D:.</li>
+        <li><strong>Download speed measured against the real file</strong> — a 300 MB ranged GET on shard 1 of 34 of the actual Ryanchen911 repo, not a synthetic speed test.</li>
       </ul>
     </div>
     <div class="card">
       <h4>Not done</h4>
       <ul>
-        <li><strong>Nothing downloaded, nothing installed, $0 spent.</strong></li>
-        <li>No model run — the sizes rule it out before it's worth trying.</li>
-        <li>A hardware probe was queued to the rig and then <strong>cancelled</strong> when I saw it sitting behind your v29 render batch; a disk benchmark firing mid-render would have slowed your clips. Rig specs above are the measured figures from 4 Aug.</li>
+        <li><strong>Nothing downloaded, nothing installed, $0 spent.</strong> The probes are read-only.</li>
+        <li>No model run — so every tok/s figure in §08 is <em>modelled</em> from measured disk rates and the one published resident-speed anchor, not observed. Running it is what settles it.</li>
+        <li>An earlier probe was queued then <strong>cancelled</strong> because it sat behind your v29 render batch; a disk benchmark firing mid-render would have slowed your clips. Re-run once the queue went idle.</li>
         <li>Venice.ai's hosted endpoint is unverified — flagged as a lead only.</li>
+        <li>Whether 48 GB DIMMs actually post on this board — SMBIOS says the array maximum is 128 GB, and I did not test past that.</li>
       </ul>
     </div>
   </div>
